@@ -1,0 +1,98 @@
+06-14-项目准备，项目功能展示
+==一个后台管理系统，
+1.登录
+2.首页
+   1.用户管理
+   2.权限管理
+   		1.角色列表
+   		2.权限列表
+   3.商品管理
+   		1.商品列表
+   		2.商品分类
+   		3.分类参数
+   4.订单管理
+   		1.订单列表
+   5.数据统计
+   		1.数据报表
+   项目中多次重复的视图，不重复去写		
+----------------------------------------------
+
+ 06-15-项目-准备-项目准备素材说明
+ itcast.sql数据库文件导入navicat。
+ 后台已经写好了api-server  进入api-server文件夹，
+ config的default.json配置数据库信息里面
+ node app.js来运行这个node项目
+
+----------------------------------------------
+
+06-16-项目-准备-批处理
+把想要的指令写在.bat中
+node app.js
+双击bat文件就会批处理执行命令
+
+-----------------------------------------------
+12345
+06-17-项目-准备-vue-cli创建项目结构
+
+------------------------------------------------
+1.安装脚手架工具  npm install --global vue-cli
+2. vue init webpack houtaiVue 
+打开项目目录。
+
+07-01-项目-准备-(项目目录)说明
+把模板挂载到根组件
+config 配置文件 本地的服务器，的一些配置的环境
+build webpack生产打包文件  webpack干的事情
+	1.webpack.base.conf.js
+	2.webpack.dev.conf.js
+	3.webpack.prod.conf.js
+static静态文件
+src代码
+node_modules包
+nore排除文件
+eslintrc.js 验证的配置文件
+gitignore排除文件
+README.md项目说明文件
+.babellrc用来将es6代码转换成浏览器能够识别的代码
+.editorconfig 编辑者配置文件
+package.json 包管理json文件
+.postcssrc.js 众所周知为兼容所有浏览器，有的CSS属性需要对不同的浏览器加上前缀，
+
+--------------------------------------------
+07-02-项目-准备-代码规范-自定义指令-lintfix  
+   1.必需用全等===
+   2.尾巴没有;
+   3.不允许出现一个以上的空行
+   4.// 模板把根组件放在模板中,把模板放在el中 注释空格加1个
+   5.没用的变量不需要
+   6.关键字后面加空格
+   7.函数名加空格
+   8.字符串用单引号
+   怎么去统一修改这些错误？
+   去package.json自定义个指令
+   npm run lintfix去修复这些问题。
+   执行eslint看看是否是指令   
+   一些git的指令也可以放在这里去设置
+不能搞一些没用的变量，不用的换行。会报很多错，因为没搞定eslint
+"dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js --open" 会启动服务器自动打开浏览器
+9.module: {
+    rules: [
+      // ...(config.dev.useEslint ? [createLintingRule()] : []), 直接在配置文件中把eslint干掉了。webpack.base.conf.js
+
+----------------------------------
+07-03-项目-准备-element-ui-文档分析	  https://element.eleme.cn/#/zh-CN/component/installation
+vue项目的pc端项目--饿了么团队
+推荐使用 npm 的方式安装，它能更好地和 webpack 打包工具配合使用。
+npm install element-ui -S
+
+07-04-项目-准备-element-ui-安装-引入
+npm install element-ui --save-dev
+main.js中
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+Vue.use(ElementUI);
+
+07-05-项目-准备-项目模板简化-调整
+
+
+07-06-项目-准备-git 版本控制
