@@ -4,7 +4,7 @@
         <el-row>
             <el-col :span="8"><div class="grid-content bg-purple">img</div></el-col>
             <el-col :span="8"><div class="grid-content bg-purple-light">后台管理系统</div></el-col>
-            <el-col :span="8"><div class="grid-content bg-purple">退出</div></el-col>
+            <el-col :span="8"><div class="grid-content bg-purple" @click="handleOut()">退出</div></el-col>
         </el-row>
     </el-header>
     <el-container>
@@ -89,6 +89,17 @@ export default {
   beforeCreate(){
       const token = localStorage.getItem("token")
       if(!token){
+          this.$router.push({name:'login'})
+      }
+  },
+  methods:{
+      handleOut(){
+          console.log(1)
+          localStorage.clear();
+          this.$message({
+                message: '恭喜你，这是一条成功消息',
+                type: 'success'
+            });
           this.$router.push({name:'login'})
       }
   }
