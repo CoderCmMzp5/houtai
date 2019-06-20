@@ -14,19 +14,19 @@
 </template>
 <script>
 export default {
-  name: "login",
-  data() {
+  name: 'login',
+  data () {
     return {
-      labelPosition: "top",
+      labelPosition: 'top',
       formData: {
-        username: "",
-        password: ""
+        username: '',
+        password: ''
       }
-    };
+    }
   },
   methods: {
-    async handleLogin() {
-    //  const res = await this.$http.post("login", this.formData);
+    handleLogin () {
+    //  async const res = await this.$http.post("login", this.formData);
     //    console.log(res)
     //   if (res) {
     //   } else {
@@ -45,35 +45,33 @@ export default {
     //     });
     //     //不成功
     //   }
-
-      console.log("异步");
-        this.$http
-          .post("login", this.formData)
-          .then(res => {
-              console.log("login")
+      console.log('异步')
+      this.$http
+        .post('login', this.formData)
+        .then(res => {
+          console.log('login')
+        })
+        .catch(() => {
+          console.log('catch')
+          // 结构赋值 const { data, meta: { msg, status } } = res.data;
+          // 登录成功,跳转首页
+          var status = 200
+          if (status === 200) {
+            this.$router.push({ name: 'home' })
+            // 保存客户的token值
+            localStorage.setItem('token', '1')
+          }
+          // 提示成功
+          this.$message({
+            message: '恭喜你，这是一条成功消息',
+            type: 'success'
           })
-          .catch(() => {
-              console.log("catch")
-               //结构赋值 const { data, meta: { msg, status } } = res.data;
-
-              //登录成功,跳转首页
-              var status = 200;
-              if (status === 200) {
-                  this.$router.push({ name: "home" });
-                  //保存客户的token值
-                  localStorage.setItem('token','1')
-              }
-              //提示成功
-              this.$message({
-                  message: '恭喜你，这是一条成功消息',
-                  type: 'success'
-              });
-              //不成功
-          });
-          console.log("异步")
+          // 不成功
+        })
+      console.log('异步')
     }
   }
-};
+}
 </script>
 
 <style>
@@ -97,4 +95,3 @@ export default {
   color: #fff;
 }
 </style>
-
