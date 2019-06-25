@@ -47,15 +47,15 @@
             label="用户状态">
                 <template slot-scope="scope">
                     <el-switch
-                        v-model="scope.row.mg_state" active-color="#13ce66"  inactive-color="#ff4949">
+                        v-model="scope.row.mg_state" active-color="#13ce66"  inactive-color="#ff4949" @change='changeMgState(scope.row)'>
                     </el-switch>
                 </template>
             </el-table-column>
              <el-table-column
             label="操作">
                 <teamplate slot-scope="scope">
-                     <el-button plain size="mini" type="primary" icon="el-icon-edit" circle @click="showEditUserDia()"></el-button>
-                     <el-button plain size="mini" type="success" icon="el-icon-check" circle></el-button>
+                     <el-button plain size="mini" type="primary" icon="el-icon-edit" circle @click="showEditUserDia(scope.row)"></el-button>
+                     <el-button plain size="mini" type="success" icon="el-icon-check" circle  @click="showSetUserRoleDia(scope.row)"></el-button>
                      <el-button plain size="mini" type="danger" icon="el-icon-delete" circle @click="delMsgBox(scope.row.id)"></el-button>
                 </teamplate>
             </el-table-column>
@@ -72,7 +72,7 @@
         <el-dialog title="添加用户" :visible.sync="dialogFormVisible">
             <el-form :model="form">
                 <el-form-item label="用户名" label-width="100px">
-                <el-input v-model="form.name" autocomplete="off"></el-input>
+                <el-input v-model="form.username" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="密码" label-width="100px">
                 <el-input v-model="form.password" autocomplete="off"></el-input>
@@ -92,7 +92,7 @@
         <el-dialog title="编辑用户" :visible.sync="dialogEditFormVisible">
             <el-form :model="form">
                 <el-form-item label="用户名" label-width="100px">
-                <el-input v-model="form.name" autocomplete="off"></el-input>
+                <el-input v-model="form.username" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="邮箱" label-width="100px">
                 <el-input v-model="form.email" autocomplete="off"></el-input>
@@ -106,95 +106,188 @@
                 <el-button type="primary" @click="editTable()">确 定</el-button>
             </div>
         </el-dialog>
+
+        <el-dialog title="用户角色" :visible.sync="dialogEditFormVisibleRole">
+            <el-form :model="form">
+                <el-form-item label="用户名" label-width="100px">
+                  {{"当前用户名"}}
+                </el-form-item>
+                <el-form-item label="角色" label-width="100px">{{currRoleId}}
+                  <el-select v-model="currRoleId" placeholder="请选择">
+                    <el-option
+                      v-for="item in userRoleData"
+                      :key="item.value"
+                      :label="item.roleName"
+                      :value="item.id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogEditFormVisibleRole = false">取 消</el-button>
+                <el-button type="primary" @click="setRole()">确 定</el-button>
+            </div>
+        </el-dialog>
     </el-card>
 </template>
 <script>
 export default {
-  name: 'users',
-  created () {
-    this.getUserList()
+  name: "users",
+  created() {
+    this.getUserList();
   },
-  data () {
+  data() {
     return {
-      query: '',
+      query: "",
       pageNum: 1,
       pageSize: 2,
       userList: [],
       total: -1,
       dialogFormVisible: false,
       dialogEditFormVisible: false,
+      dialogEditFormVisibleRole: false,
       form: {
-        username: '',
-        password: '',
-        email: '',
-        mobile: ''
-      }
-    }
+        username: "",
+        password: "",
+        email: "",
+        mobile: "",
+        currentUsername: ""
+      },
+      currRoleId: -1,
+      currUserId: -1,
+      userRoleData: [],
+        value: ''
+    };
   },
   methods: {
-    delMsgBox (userId) {
-      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
-          this.$http.delete(`users/:${userId}`).then(() => {}).catch(() => {
-            this.pageNum = 1
-            this.getUserList()
-          })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
+    setRole(){
+      this.dialogEditFormVisibleRole = false;
+      //发送请求
+      //this.currUserId  this.currRoleId
+
     },
-    AddUser () {
+    showSetUserRoleDia(user) {
+      this.currentUsername = user.username;
+      //获取
+      this.currRoleId = 39;
+      this.currUserId=user.id
+      this.userRoleData = [
+        { id: 30, roleDesc: "技术负责任", roleName: "主管" },
+        { id: 34, roleDesc: "测试角色", roleName: "测试角色" },
+        { id: 39, roleDesc: "超级管理员", roleName: "超级管理员" }]
+      this.dialogEditFormVisibleRole = true;
+    },
+    changeMgState(user) {
+      console.log(user.mg_state);
       this.$http
-        .post('users', this.form)
+        .post("users", this.form)
         .then(res => {
-          this.dialogFormVisible = false
+          this.dialogFormVisible = false;
         })
         .catch(() => {
-          this.$message.success('成功')
-          this.dialogFormVisible = false
-          this.pageNum = 1
-          this.getUserList()
+          this.$message.success("成功");
+          this.dialogFormVisible = false;
+          this.pageNum = 1;
+          this.getUserList();
           // this.form={username:'',password:'',email:'',mobile:''}
           for (const key in this.form) {
             if (this.form.hasOwnProperty(key)) {
-              this.form[key] = ''
+              this.form[key] = "";
             }
           }
+          this.dialogEditFormVisible = false;
+          this.getUserList();
+        });
+    },
+    editTable() {
+      this.$http
+        .post("users", this.form)
+        .then(res => {
+          this.dialogFormVisible = false;
         })
+        .catch(() => {
+          this.$message.success("成功");
+          this.dialogFormVisible = false;
+          this.pageNum = 1;
+          this.getUserList();
+          // this.form={username:'',password:'',email:'',mobile:''}
+          for (const key in this.form) {
+            if (this.form.hasOwnProperty(key)) {
+              this.form[key] = "";
+            }
+          }
+          this.dialogEditFormVisible = false;
+          this.getUserList();
+        });
     },
-    showEditUserDia(){
-      this.dialogEditFormVisible = true
+    delMsgBox(userId) {
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "删除成功!"
+          });
+          this.$http
+            .delete(`users/:${userId}`)
+            .then(() => {})
+            .catch(() => {
+              this.pageNum = 1;
+              this.getUserList();
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
-    showAddUserDia () {
-      this.dialogFormVisible = true
+    AddUser() {
+      this.$http
+        .post("users", this.form)
+        .then(res => {
+          this.dialogFormVisible = false;
+        })
+        .catch(() => {
+          this.$message.success("成功");
+          this.dialogFormVisible = false;
+          this.pageNum = 1;
+          this.getUserList();
+          // this.form={username:'',password:'',email:'',mobile:''}
+          for (const key in this.form) {
+            if (this.form.hasOwnProperty(key)) {
+              this.form[key] = "";
+            }
+          }
+        });
     },
-    searchUser () {
-      this.getUserList()
+    showEditUserDia(user) {
+      console.log(user.username);
+      this.form = user;
+      this.dialogEditFormVisible = true;
     },
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
-      this.pageSize = val
-      this.getUserList()
+    showAddUserDia() {
+      this.dialogFormVisible = true;
+    },
+    searchUser() {
+      this.getUserList();
+    },
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+      this.pageSize = val;
+      this.getUserList();
       // 调后台
     },
-    handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
-      this.pageNum = val
-      this.getUserList()
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+      this.pageNum = val;
+      this.getUserList();
     },
-    getUserList () {
+    getUserList() {
       // 设置请求头
       //   const AUTH_TOKEN = localStorage.getItem("token");
       //   this.$http.defaults.header.common["Authorzation"] = AUTH_TOKEN;
@@ -207,55 +300,55 @@ export default {
         .then(res => {})
         .catch(() => {
           // const {data:{users,total},meta:{msg, status}}=res.data
-          const status_ = 200
-          const total_ = 16
+          const status_ = 200;
+          const total_ = 16;
           const users_ = [
             {
               create_time: 1486720211,
-              email: 'youxiang1',
+              email: "youxiang1",
               id: 500,
               mg_state: true,
               mobile: 1234,
-              role_name: '主管',
-              username: 'admin'
+              role_name: "主管",
+              username: "admin"
             },
             {
               create_time: 1486720211,
-              email: 'youxiang2',
+              email: "youxiang2",
               id: 501,
               mg_state: true,
               mobile: 1234,
-              role_name: '主管',
-              username: 'admin'
+              role_name: "主管2",
+              username: "admin"
             },
             {
               create_time: 1486720211,
-              email: 'youxiang3',
+              email: "youxiang3",
               id: 502,
               mg_state: true,
               mobile: 1234,
-              role_name: '主管',
-              username: 'admin'
+              role_name: "主管3",
+              username: "admin"
             },
             {
               create_time: 1486720211,
-              email: 'youxiang4',
+              email: "youxiang4",
               id: 503,
               mg_state: true,
               mobile: 1234,
-              role_name: '主管',
-              username: 'admin'
+              role_name: "主管4",
+              username: "admin"
             }
-          ]
+          ];
           if (status_ == 200) {
-            this.userList = users_
-            console.log(users_)
-            this.total = total_
+            this.userList = users_;
+            console.log(users_);
+            this.total = total_;
           }
-        })
+        });
     }
   }
-}
+};
 </script>
 <style>
 .box-card {
